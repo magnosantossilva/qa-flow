@@ -462,11 +462,12 @@
 <div class="toast" id="toast"></div>
 
 <script>
-let state = {
+window.state = {
   flows: [],
   activeFlow: null,
   bugs: []
 };
+let state = window.state;
 
 // ---- UTIL ----
 function toast(msg) {
@@ -474,13 +475,17 @@ function toast(msg) {
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
+window.toast = toast;
 function uid() { return '_' + Math.random().toString(36).substr(2,9); }
 function updateHeaderStats() {
   document.getElementById('total-flows').textContent = state.flows.length;
   const steps = state.flows.reduce((a,f) => a + (f.steps||[]).length, 0);
   document.getElementById('total-steps').textContent = steps;
   document.getElementById('total-bugs').textContent = state.bugs.length;
+  // Salva na nuvem sempre que os stats mudam
+  if (window.saveToCloud) window.saveToCloud();
 }
+window.updateHeaderStats = updateHeaderStats;
 
 // ---- TABS ----
 function switchTab(tab) {
@@ -536,6 +541,7 @@ function renderFlowsList() {
     </div>`;
   }).join('');
 }
+window.renderFlowsList = renderFlowsList;
 
 function loadFlow(id) {
   state.activeFlow = id;
@@ -681,6 +687,7 @@ function renderBugsList() {
     </div>
   `).join('');
 }
+window.renderBugsList = renderBugsList;
 
 // ---- EXPORT ----
 function openExport() {
@@ -741,57 +748,52 @@ function downloadReport() {
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
 </script>
-  <!-- Firebase SDK -->
+
+<!-- Firebase SDK — CORRETO -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs,
-           doc, updateDoc, deleteDoc, onSnapshot }
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc }
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+  // ✅ Suas credenciais do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDhNyWlnP8It-A36qCts2lfsWYsQae2FMw",
+    authDomain: "qa-flow-meus-testes.firebaseapp.com",
+    projectId: "qa-flow-meus-testes",
+    storageBucket: "qa-flow-meus-testes.firebasestorage.app",
+    messagingSenderId: "527010524546",
+    appId: "1:527010524546:web:0e4135e8f9db3a9238b39b"
+  };
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDhNyWlnP8It-A36qCts2lfsWYsQae2FMw",
-  authDomain: "qa-flow-meus-testes.firebaseapp.com",
-  projectId: "qa-flow-meus-testes",
-  storageBucket: "qa-flow-meus-testes.firebasestorage.app",
-  messagingSenderId: "527010524546",
-  appId: "1:527010524546:web:0e4135e8f9db3a9238b39b"
-};
+  // ✅ Inicializa o Firebase e o Firestore corretamente
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-  
-  // Carrega dados salvos ao abrir o app
+  // ✅ Carrega dados salvos ao abrir o app
   window.addEventListener('load', async () => {
     try {
       const snap = await getDocs(collection(db, 'qa_state'));
       if (!snap.empty) {
         const saved = snap.docs[0].data();
-        if (saved.flows) state.flows = JSON.parse(saved.flows);
-        if (saved.bugs)  state.bugs  = JSON.parse(saved.bugs);
+        if (saved.flows) window.state.flows = JSON.parse(saved.flows);
+        if (saved.bugs)  window.state.bugs  = JSON.parse(saved.bugs);
         window._stateDocId = snap.docs[0].id;
-        renderFlowsList();
-        renderBugsList();
-        updateHeaderStats();
-        toast('✅ Dados carregados da nuvem!');
+        window.renderFlowsList();
+        window.renderBugsList();
+        window.updateHeaderStats();
+        window.toast('✅ Dados carregados da nuvem!');
       }
-    } catch(e) { console.log('Sem dados salvos ainda.'); }
+    } catch(e) {
+      console.log('Sem dados salvos ainda ou erro ao carregar:', e);
+    }
   });
 
-  // Salva automaticamente ao alterar state
-  const _origSave = window.updateHeaderStats;
-  window.updateHeaderStats = async function() {
-    _origSave && _origSave();
+  // ✅ Função global de salvamento no Firebase
+  window.saveToCloud = async function() {
     try {
       const payload = {
-        flows: JSON.stringify(state.flows),
-        bugs:  JSON.stringify(state.bugs),
+        flows: JSON.stringify(window.state.flows),
+        bugs:  JSON.stringify(window.state.bugs),
         updated: new Date().toISOString()
       };
       if (window._stateDocId) {
@@ -800,7 +802,9 @@ const app = initializeApp(firebaseConfig);
         const ref = await addDoc(collection(db, 'qa_state'), payload);
         window._stateDocId = ref.id;
       }
-    } catch(e) { console.error('Erro ao salvar:', e); }
+    } catch(e) {
+      console.error('Erro ao salvar na nuvem:', e);
+    }
   };
 </script>
 </body>
