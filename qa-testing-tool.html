@@ -741,5 +741,67 @@ function downloadReport() {
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
 </script>
+  <!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs,
+           doc, updateDoc, deleteDoc, onSnapshot }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDhNyWlnP8It-A36qCts2lfsWYsQae2FMw",
+  authDomain: "qa-flow-meus-testes.firebaseapp.com",
+  projectId: "qa-flow-meus-testes",
+  storageBucket: "qa-flow-meus-testes.firebasestorage.app",
+  messagingSenderId: "527010524546",
+  appId: "1:527010524546:web:0e4135e8f9db3a9238b39b"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+  
+  // Carrega dados salvos ao abrir o app
+  window.addEventListener('load', async () => {
+    try {
+      const snap = await getDocs(collection(db, 'qa_state'));
+      if (!snap.empty) {
+        const saved = snap.docs[0].data();
+        if (saved.flows) state.flows = JSON.parse(saved.flows);
+        if (saved.bugs)  state.bugs  = JSON.parse(saved.bugs);
+        window._stateDocId = snap.docs[0].id;
+        renderFlowsList();
+        renderBugsList();
+        updateHeaderStats();
+        toast('✅ Dados carregados da nuvem!');
+      }
+    } catch(e) { console.log('Sem dados salvos ainda.'); }
+  });
+
+  // Salva automaticamente ao alterar state
+  const _origSave = window.updateHeaderStats;
+  window.updateHeaderStats = async function() {
+    _origSave && _origSave();
+    try {
+      const payload = {
+        flows: JSON.stringify(state.flows),
+        bugs:  JSON.stringify(state.bugs),
+        updated: new Date().toISOString()
+      };
+      if (window._stateDocId) {
+        await updateDoc(doc(db, 'qa_state', window._stateDocId), payload);
+      } else {
+        const ref = await addDoc(collection(db, 'qa_state'), payload);
+        window._stateDocId = ref.id;
+      }
+    } catch(e) { console.error('Erro ao salvar:', e); }
+  };
+</script>
 </body>
 </html>
