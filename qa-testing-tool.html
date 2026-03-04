@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Flow — Gerenciador de Testes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a24;
+    --surface2: #1e2333;
+    --border: #2a3148;
+    --accent: #4fffb0;
+    --accent2: #ff6b6b;
+    --accent3: #ffd166;
+    --accent4: #74b9ff;
+    --text: #e8eaf0;
+    --muted: #7a82a0;
+    --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 800; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .header-stats { display: flex; gap: 24px; }
+  .stat-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 20px; font-size: .8rem; font-family: 'JetBrains Mono';
+  }
+  .stat-pill span { color: var(--accent); font-weight: 600; }
+
+  /* MAIN LAYOUT */
+  .app { display: grid; grid-template-columns: 280px 1fr 340px; height: calc(100vh - 61px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-header {
+    padding: 20px; border-bottom: 1px solid var(--border);
+    font-size: .75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted);
+  }
+  .sidebar-actions { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .btn {
+    padding: 10px 16px; border-radius: var(--radius);
+    border: none; cursor: pointer; font-family: 'Syne'; font-size: .85rem; font-weight: 600;
+    display: flex; align-items: center; gap: 8px; transition: all .2s;
+  }
+  .btn-primary { background: var(--accent); color: #0d0f14; }
+  .btn-primary:hover { background: #3de89d; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(79,255,176,.3); }
+  .btn-danger { background: rgba(255,107,107,.15); color: var(--accent2); border: 1px solid rgba(255,107,107,.3); }
+  .btn-danger:hover { background: rgba(255,107,107,.25); }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .flows-list { flex: 1; overflow-y: auto; padding: 0 16px 16px; }
+  .flow-item {
+    padding: 12px 14px; border-radius: var(--radius); margin-bottom: 6px;
+    cursor: pointer; border: 1px solid transparent; transition: all .2s;
+  }
+  .flow-item:hover { background: var(--surface2); border-color: var(--border); }
+  .flow-item.active { background: rgba(79,255,176,.08); border-color: rgba(79,255,176,.3); }
+  .flow-name { font-weight: 600; font-size: .9rem; margin-bottom: 4px; }
+  .flow-meta { display: flex; gap: 8px; font-size: .75rem; color: var(--muted); font-family: 'JetBrains Mono'; }
+  .badge {
+    padding: 2px 8px; border-radius: 10px; font-size: .7rem; font-weight: 600; font-family: 'JetBrains Mono';
+  }
+  .badge-ok { background: rgba(79,255,176,.15); color: var(--accent); }
+  .badge-bug { background: rgba(255,107,107,.15); color: var(--accent2); }
+  .badge-warn { background: rgba(255,209,102,.15); color: var(--accent3); }
+
+  /* MAIN CONTENT */
+  .main { overflow-y: auto; background: var(--bg); }
+  .main-inner { padding: 28px 32px; max-width: 900px; }
+
+  .section-title {
+    font-size: 1.4rem; font-weight: 800; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-sub { color: var(--muted); font-size: .85rem; margin-bottom: 24px; font-family: 'JetBrains Mono'; }
+
+  /* STEPS */
+  .steps-area { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .step-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; transition: border-color .2s;
+  }
+  .step-card:hover { border-color: var(--accent4); }
+  .step-header {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    border-bottom: 1px solid var(--border); cursor: pointer;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--surface2); display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 700; font-family: 'JetBrains Mono';
+    flex-shrink: 0; color: var(--accent4);
+  }
+  .step-title-input {
+    flex: 1; background: transparent; border: none; color: var(--text);
+    font-family: 'Syne'; font-size: .9rem; font-weight: 600; outline: none;
+  }
+  .step-title-input::placeholder { color: var(--muted); }
+  .step-status-btn {
+    padding: 4px 10px; border-radius: 6px; border: none; cursor: pointer;
+    font-family: 'JetBrains Mono'; font-size: .72rem; font-weight: 600; transition: all .2s;
+  }
+  .status-pending { background: rgba(122,130,160,.15); color: var(--muted); }
+  .status-ok { background: rgba(79,255,176,.15); color: var(--accent); }
+  .status-bug { background: rgba(255,107,107,.15); color: var(--accent2); }
+  .status-blocked { background: rgba(255,209,102,.15); color: var(--accent3); }
+
+  .step-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .step-desc {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-family: 'JetBrains Mono'; font-size: .82rem;
+    padding: 10px 12px; border-radius: 8px; resize: vertical; min-height: 60px;
+    outline: none; transition: border-color .2s;
+  }
+  .step-desc:focus { border-color: var(--accent4); }
+  .step-desc::placeholder { color: var(--muted); }
+
+  .screenshot-zone {
+    border: 2px dashed var(--border); border-radius: 8px; padding: 16px;
+    text-align: center; cursor: pointer; transition: all .2s;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    font-size: .82rem; color: var(--muted);
+  }
+  .screenshot-zone:hover { border-color: var(--accent4); color: var(--accent4); background: rgba(116,185,255,.05); }
+  .screenshot-zone input { display: none; }
+  .screenshot-preview {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+  }
+  .screenshot-thumb {
+    position: relative; width: 80px; height: 60px;
+    border-radius: 6px; overflow: hidden; border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .screenshot-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .screenshot-thumb .del-img {
+    position: absolute; top: 2px; right: 2px;
+    background: rgba(255,107,107,.9); border: none; border-radius: 4px;
+    color: white; font-size: .65rem; cursor: pointer; padding: 2px 4px;
+    display: none;
+  }
+  .screenshot-thumb:hover .del-img { display: block; }
+
+  .add-step-btn {
+    width: 100%; padding: 12px; border-radius: var(--radius);
+    border: 2px dashed var(--border); background: transparent;
+    color: var(--muted); font-family: 'Syne'; font-size: .85rem;
+    cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .add-step-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,255,176,.05); }
+
+  /* BUG PANEL */
+  .panel {
+    background: var(--surface); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .panel-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .panel-tab {
+    flex: 1; padding: 14px; text-align: center; cursor: pointer;
+    font-size: .82rem; font-weight: 600; color: var(--muted); border: none;
+    background: transparent; transition: all .2s; border-bottom: 2px solid transparent;
+  }
+  .panel-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .panel-body { flex: 1; overflow-y: auto; padding: 16px; }
+
+  .bug-form { display: flex; flex-direction: column; gap: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .form-input, .form-select, .form-textarea {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    font-family: 'JetBrains Mono'; font-size: .82rem; padding: 9px 12px;
+    border-radius: 8px; outline: none; transition: border-color .2s; width: 100%;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-select option { background: var(--surface2); }
+
+  .bugs-list { display: flex; flex-direction: column; gap: 10px; }
+  .bug-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px; transition: border-color .2s;
+    cursor: pointer;
+  }
+  .bug-card:hover { border-color: var(--accent2); }
+  .bug-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .bug-title { font-size: .88rem; font-weight: 600; }
+  .severity-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+  }
+  .sev-critical { background: #ff4757; box-shadow: 0 0 8px #ff4757; }
+  .sev-high { background: var(--accent2); }
+  .sev-medium { background: var(--accent3); }
+  .sev-low { background: var(--accent4); }
+  .bug-meta { font-size: .75rem; color: var(--muted); font-family: 'JetBrains Mono'; margin-bottom: 6px; }
+  .bug-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    display: none; align-items: center; justify-content: center; z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; width: 90%; max-width: 620px; max-height: 90vh;
+    overflow-y: auto; padding: 28px;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+  /* EXPORT */
+  .export-preview {
+    background: white; color: #1a1a2e; padding: 32px;
+    font-family: 'JetBrains Mono'; font-size: .8rem; line-height: 1.8;
+    border-radius: var(--radius); max-height: 400px; overflow-y: auto;
+    border: 1px solid var(--border);
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 60px 20px; color: var(--muted); text-align: center; gap: 12px;
+  }
+  .empty-icon { font-size: 3rem; opacity: .4; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--surface); border: 1px solid var(--accent);
+    color: var(--accent); padding: 12px 20px; border-radius: var(--radius);
+    font-size: .85rem; font-weight: 600; z-index: 9999;
+    transform: translateY(20px); opacity: 0; transition: all .3s;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .step-card .remove-step {
+    background: transparent; border: none; color: var(--muted);
+    cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 6px;
+    transition: all .2s;
+  }
+  .step-card .remove-step:hover { color: var(--accent2); background: rgba(255,107,107,.1); }
+
+  .flow-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(116,185,255,.1); color: var(--accent4); border: 1px solid rgba(116,185,255,.2);
+    padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-family: 'JetBrains Mono';
+    cursor: pointer; transition: all .2s;
+  }
+  .flow-tag:hover { background: rgba(116,185,255,.2); }
+  .tags-area { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-dot"></div> QA Flow</div>
+  <div class="header-stats">
+    <div class="stat-pill">Fluxos: <span id="total-flows">0</span></div>
+    <div class="stat-pill">Passos: <span id="total-steps">0</span></div>
+    <div class="stat-pill">Bugs: <span id="total-bugs">0</span></div>
+  </div>
+  <button class="btn btn-ghost" onclick="openExport()" style="font-size:.82rem;padding:8px 16px;">⬇ Exportar Relatório</button>
+</header>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">Fluxos de Teste</div>
+    <div class="sidebar-actions">
+      <button class="btn btn-primary" onclick="openNewFlow()">+ Novo Fluxo</button>
+    </div>
+    <div class="flows-list" id="flows-list">
+      <div class="empty-state"><div class="empty-icon">🗂</div><div>Crie seu primeiro fluxo de teste</div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-inner" id="main-content">
+      <div class="empty-state" style="margin-top:80px;">
+        <div class="empty-icon">🧪</div>
+        <div style="font-size:1.1rem;font-weight:700;">Selecione ou crie um fluxo</div>
+        <div style="font-size:.85rem;">Mapeie os passos do teste, capture telas e registre bugs</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PANEL -->
+  <aside class="panel">
+    <div class="panel-tabs">
+      <button class="panel-tab active" onclick="switchTab('bugs')" id="tab-bugs">🐛 Bugs</button>
+      <button class="panel-tab" onclick="switchTab('report')" id="tab-report">📋 Relato</button>
+    </div>
+    <div class="panel-body" id="panel-bugs">
+      <div class="bug-form" id="bug-form" style="margin-bottom:20px;">
+        <div style="font-size:.82rem;font-weight:700;color:var(--accent2);margin-bottom:4px;">Registrar Bug</div>
+        <div class="form-group">
+          <label class="form-label">Título do Bug</label>
+          <input class="form-input" id="bug-title" placeholder="Ex: Produto não atualiza estoque após saída">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Módulo Afetado</label>
+          <select class="form-select" id="bug-module">
+            <option value="">Selecionar módulo...</option>
+            <option>Produto</option>
+            <option>Entrada</option>
+            <option>Estoque</option>
+            <option>Saída</option>
+            <option>Devolução</option>
+            <option>Financeiro</option>
+            <option>Relatório</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Severidade</label>
+          <select class="form-select" id="bug-severity">
+            <option value="critical">🔴 Crítico — Sistema parado</option>
+            <option value="high">🟠 Alto — Funcionalidade quebrada</option>
+            <option value="medium" selected>🟡 Médio — Impacto parcial</option>
+            <option value="low">🔵 Baixo — Cosmético / menor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comportamento Esperado</label>
+          <textarea class="form-textarea" id="bug-expected" placeholder="O que deveria acontecer?"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comportamento Atual</label>
+          <textarea class="form-textarea" id="bug-actual" placeholder="O que está acontecendo de errado?"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passo a Passo para Reproduzir</label>
+          <textarea class="form-textarea" id="bug-steps" placeholder="1. Acesse o módulo de Saída&#10;2. Informe o produto X&#10;3. Confirme a saída&#10;4. Verifique o estoque..." style="min-height:100px;"></textarea>
+        </div>
+        <button class="btn btn-danger" onclick="saveBug()" style="width:100%;justify-content:center;">
+          🐛 Registrar Bug
+        </button>
+      </div>
+      <div id="bugs-list-container">
+        <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Bugs Registrados</div>
+        <div class="bugs-list" id="bugs-list">
+          <div style="color:var(--muted);font-size:.82rem;text-align:center;padding:20px;">Nenhum bug registrado</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body" id="panel-report" style="display:none;">
+      <div style="font-size:.82rem;font-weight:700;color:var(--accent4);margin-bottom:12px;">Modelo de Relato de Bug</div>
+      <div style="font-size:.8rem;color:var(--muted);line-height:1.7;font-family:'JetBrains Mono';">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;">
+          <div style="color:var(--accent);margin-bottom:8px;font-weight:600;"># Estrutura Ideal de Bug Report</div>
+          <div><b style="color:var(--text);">Título:</b> [Módulo] Descrição curta e direta</div><br>
+          <div><b style="color:var(--text);">Ambiente:</b> Versão / Navegador / OS</div><br>
+          <div><b style="color:var(--text);">Severidade:</b> Crítico / Alto / Médio / Baixo</div><br>
+          <div><b style="color:var(--text);">Comportamento Esperado:</b><br>Descreva o que o sistema deveria fazer.</div><br>
+          <div><b style="color:var(--text);">Comportamento Atual:</b><br>Descreva o que está acontecendo de errado.</div><br>
+          <div><b style="color:var(--text);">Passos para Reproduzir:</b><br>1. Acesse...<br>2. Clique em...<br>3. Observe que...</div><br>
+          <div><b style="color:var(--text);">Evidência:</b> Print / Vídeo anexado</div>
+        </div>
+        <div style="background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);border-radius:8px;padding:12px;">
+          <div style="color:var(--accent2);margin-bottom:6px;font-weight:600;">⚠ Evite no título:</div>
+          <div>❌ "Está quebrando"</div>
+          <div>❌ "Bug no sistema"</div>
+          <div>❌ "Não funciona"</div>
+          <div style="color:var(--accent);margin-top:8px;margin-bottom:6px;font-weight:600;">✅ Prefira:</div>
+          <div>✅ "[Estoque] Qty não decrementa após confirmar saída"</div>
+          <div>✅ "[Produto] Cadastro aceita preço negativo sem validação"</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- MODAL NOVO FLUXO -->
+<div class="modal-overlay" id="modal-new-flow">
+  <div class="modal">
+    <div class="modal-title">Novo Fluxo de Teste</div>
+    <div class="bug-form">
+      <div class="form-group">
+        <label class="form-label">Nome do Fluxo</label>
+        <input class="form-input" id="new-flow-name" placeholder="Ex: Alteração de Produto - Impacto em Módulos">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Módulos Envolvidos</label>
+        <div class="tags-area" id="tags-area">
+          <div class="flow-tag" onclick="toggleTag(this,'Produto')">+ Produto</div>
+          <div class="flow-tag" onclick="toggleTag(this,'Entrada')">+ Entrada</div>
+          <div class="flow-tag" onclick="toggleTag(this,'Estoque')">+ Estoque</div>
+          <div class="flow-tag" onclick="toggleTag(this,'Saída')">+ Saída</div>
+          <div class="flow-tag" onclick="toggleTag(this,'Devolução')">+ Devolução</div>
+          <div class="flow-tag" onclick="toggleTag(this,'Financeiro')">+ Financeiro</div>
+          <div class="flow-tag" onclick="toggleTag(this,'Relatório')">+ Relatório</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição / Contexto da Mudança</label>
+        <textarea class="form-textarea" id="new-flow-desc" placeholder="Ex: Após alteração no cadastro de produto (código/unidade), validar impacto em todos os módulos relacionados..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-flow')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createFlow()">Criar Fluxo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EXPORT -->
+<div class="modal-overlay" id="modal-export">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-title">Exportar Relatório de Testes</div>
+    <div id="export-content" class="export-preview"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-export')">Fechar</button>
+      <button class="btn btn-primary" onclick="copyReport()">📋 Copiar Relatório</button>
+      <button class="btn btn-ghost" onclick="downloadReport()">⬇ Baixar .txt</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VER IMAGEM -->
+<div class="modal-overlay" id="modal-img">
+  <div class="modal" style="background:transparent;border:none;max-width:90vw;padding:0;">
+    <img id="modal-img-src" style="max-width:100%;max-height:85vh;border-radius:10px;cursor:pointer;" onclick="closeModal('modal-img')">
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let state = {
+  flows: [],
+  activeFlow: null,
+  bugs: []
+};
+
+// ---- UTIL ----
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+function uid() { return '_' + Math.random().toString(36).substr(2,9); }
+function updateHeaderStats() {
+  document.getElementById('total-flows').textContent = state.flows.length;
+  const steps = state.flows.reduce((a,f) => a + (f.steps||[]).length, 0);
+  document.getElementById('total-steps').textContent = steps;
+  document.getElementById('total-bugs').textContent = state.bugs.length;
+}
+
+// ---- TABS ----
+function switchTab(tab) {
+  document.getElementById('panel-bugs').style.display = tab==='bugs'?'':'none';
+  document.getElementById('panel-report').style.display = tab==='report'?'':'none';
+  document.getElementById('tab-bugs').classList.toggle('active', tab==='bugs');
+  document.getElementById('tab-report').classList.toggle('active', tab==='report');
+}
+
+// ---- FLOW ----
+let selectedTags = [];
+function toggleTag(el, tag) {
+  const idx = selectedTags.indexOf(tag);
+  if (idx >= 0) { selectedTags.splice(idx,1); el.style.background=''; el.style.color=''; el.textContent = '+ '+tag; }
+  else { selectedTags.push(tag); el.style.background='rgba(116,185,255,.25)'; el.style.color='#fff'; el.textContent = '✓ '+tag; }
+}
+
+function openNewFlow() {
+  selectedTags = [];
+  document.getElementById('new-flow-name').value='';
+  document.getElementById('new-flow-desc').value='';
+  document.querySelectorAll('#tags-area .flow-tag').forEach(t => { t.style.background=''; t.style.color=''; t.textContent = '+ '+t.textContent.replace(/[✓+ ]/g,''); });
+  document.getElementById('modal-new-flow').classList.add('open');
+}
+function createFlow() {
+  const name = document.getElementById('new-flow-name').value.trim();
+  if (!name) { toast('Dê um nome ao fluxo'); return; }
+  const flow = {
+    id: uid(), name, desc: document.getElementById('new-flow-desc').value,
+    modules: [...selectedTags], steps: [], createdAt: new Date().toLocaleDateString('pt-BR')
+  };
+  state.flows.push(flow);
+  closeModal('modal-new-flow');
+  renderFlowsList();
+  loadFlow(flow.id);
+  updateHeaderStats();
+  toast('Fluxo criado!');
+}
+function renderFlowsList() {
+  const el = document.getElementById('flows-list');
+  if (!state.flows.length) { el.innerHTML='<div class="empty-state"><div class="empty-icon">🗂</div><div>Crie seu primeiro fluxo</div></div>'; return; }
+  el.innerHTML = state.flows.map(f => {
+    const bugs = state.bugs.filter(b => b.flowId===f.id).length;
+    const done = (f.steps||[]).filter(s=>s.status==='ok').length;
+    const active = state.activeFlow===f.id ? 'active':'';
+    return `<div class="flow-item ${active}" onclick="loadFlow('${f.id}')">
+      <div class="flow-name">${f.name}</div>
+      <div class="flow-meta">
+        <span>${(f.steps||[]).length} passos</span>
+        ${bugs ? `<span class="badge badge-bug">${bugs} bug${bugs>1?'s':''}</span>`:''}
+        ${done ? `<span class="badge badge-ok">${done} ok</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function loadFlow(id) {
+  state.activeFlow = id;
+  const flow = state.flows.find(f=>f.id===id);
+  renderFlowsList();
+  if (!flow) return;
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `
+    <div class="section-title">🧪 ${flow.name}</div>
+    <div class="section-sub">${flow.modules.join(' → ')} · Criado em ${flow.createdAt}</div>
+    ${flow.desc ? `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:20px;font-size:.85rem;color:var(--muted);line-height:1.6;">${flow.desc}</div>`:''}
+    <div class="steps-area" id="steps-area"></div>
+    <button class="add-step-btn" onclick="addStep('${id}')">+ Adicionar Passo de Teste</button>
+  `;
+  renderSteps(id);
+  renderBugsList();
+}
+
+// ---- STEPS ----
+function addStep(flowId) {
+  const flow = state.flows.find(f=>f.id===flowId);
+  if (!flow) return;
+  if (!flow.steps) flow.steps = [];
+  flow.steps.push({ id:uid(), title:'', desc:'', status:'pending', images:[] });
+  renderSteps(flowId);
+  updateHeaderStats();
+}
+function removeStep(flowId, stepId) {
+  const flow = state.flows.find(f=>f.id===flowId);
+  flow.steps = flow.steps.filter(s=>s.id!==stepId);
+  renderSteps(flowId);
+  updateHeaderStats();
+}
+function cycleStatus(flowId, stepId) {
+  const flow = state.flows.find(f=>f.id===flowId);
+  const step = flow.steps.find(s=>s.id===stepId);
+  const cycle = ['pending','ok','bug','blocked'];
+  step.status = cycle[(cycle.indexOf(step.status)+1)%cycle.length];
+  renderSteps(flowId);
+}
+function updateStepField(flowId, stepId, field, val) {
+  const flow = state.flows.find(f=>f.id===flowId);
+  const step = flow.steps.find(s=>s.id===stepId);
+  step[field] = val;
+}
+
+const statusLabel = { pending:'⏳ Pendente', ok:'✅ OK', bug:'🐛 Bug', blocked:'⛔ Bloqueado' };
+const statusClass = { pending:'status-pending', ok:'status-ok', bug:'status-bug', blocked:'status-blocked' };
+
+function renderSteps(flowId) {
+  const flow = state.flows.find(f=>f.id===flowId);
+  const area = document.getElementById('steps-area');
+  if (!area) return;
+  if (!flow.steps||!flow.steps.length) { area.innerHTML='<div style="color:var(--muted);font-size:.85rem;padding:8px 0;">Nenhum passo adicionado ainda.</div>'; return; }
+  area.innerHTML = flow.steps.map((s,i) => `
+    <div class="step-card" id="sc-${s.id}">
+      <div class="step-header">
+        <div class="step-num">${String(i+1).padStart(2,'0')}</div>
+        <input class="step-title-input" placeholder="Descreva a ação do passo..."
+          value="${s.title}" onchange="updateStepField('${flowId}','${s.id}','title',this.value)">
+        <button class="step-status-btn ${statusClass[s.status]}" onclick="cycleStatus('${flowId}','${s.id}')">${statusLabel[s.status]}</button>
+        <button class="remove-step" onclick="removeStep('${flowId}','${s.id}')" title="Remover">✕</button>
+      </div>
+      <div class="step-body">
+        <textarea class="step-desc" placeholder="Detalhes do passo, dados utilizados, resultado observado..."
+          onchange="updateStepField('${flowId}','${s.id}','desc',this.value)">${s.desc}</textarea>
+        <div class="screenshot-zone" onclick="document.getElementById('img-${s.id}').click()">
+          <input type="file" id="img-${s.id}" accept="image/*" multiple onchange="addImages('${flowId}','${s.id}',this)">
+          📷 Clique para anexar print / evidência
+        </div>
+        <div class="screenshot-preview" id="imgs-${s.id}">
+          ${(s.images||[]).map((img,ii)=>`
+            <div class="screenshot-thumb">
+              <img src="${img}" onclick="viewImg('${img}')">
+              <button class="del-img" onclick="removeImg('${flowId}','${s.id}',${ii})">✕</button>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addImages(flowId, stepId, input) {
+  const flow = state.flows.find(f=>f.id===flowId);
+  const step = flow.steps.find(s=>s.id===stepId);
+  if (!step.images) step.images=[];
+  Array.from(input.files).forEach(file => {
+    const r = new FileReader();
+    r.onload = e => { step.images.push(e.target.result); renderSteps(flowId); };
+    r.readAsDataURL(file);
+  });
+}
+function removeImg(flowId, stepId, idx) {
+  const flow = state.flows.find(f=>f.id===flowId);
+  const step = flow.steps.find(s=>s.id===stepId);
+  step.images.splice(idx,1);
+  renderSteps(flowId);
+}
+function viewImg(src) {
+  document.getElementById('modal-img-src').src = src;
+  document.getElementById('modal-img').classList.add('open');
+}
+
+// ---- BUGS ----
+function saveBug() {
+  const title = document.getElementById('bug-title').value.trim();
+  if (!title) { toast('Informe o título do bug'); return; }
+  const bug = {
+    id: uid(),
+    flowId: state.activeFlow,
+    title,
+    module: document.getElementById('bug-module').value,
+    severity: document.getElementById('bug-severity').value,
+    expected: document.getElementById('bug-expected').value,
+    actual: document.getElementById('bug-actual').value,
+    steps: document.getElementById('bug-steps').value,
+    createdAt: new Date().toLocaleDateString('pt-BR')
+  };
+  state.bugs.push(bug);
+  ['bug-title','bug-expected','bug-actual','bug-steps'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('bug-module').value='';
+  document.getElementById('bug-severity').value='medium';
+  renderBugsList();
+  updateHeaderStats();
+  toast('Bug registrado!');
+}
+
+const sevIcon = { critical:'🔴', high:'🟠', medium:'🟡', low:'🔵' };
+const sevClass = { critical:'sev-critical', high:'sev-high', medium:'sev-medium', low:'sev-low' };
+
+function renderBugsList() {
+  const el = document.getElementById('bugs-list');
+  const bugs = state.activeFlow ? state.bugs.filter(b=>b.flowId===state.activeFlow) : state.bugs;
+  if (!bugs.length) { el.innerHTML='<div style="color:var(--muted);font-size:.82rem;text-align:center;padding:20px;">Nenhum bug registrado neste fluxo</div>'; return; }
+  el.innerHTML = bugs.map(b=>`
+    <div class="bug-card">
+      <div class="bug-card-header">
+        <div class="bug-title">${b.title}</div>
+        <div class="severity-dot ${sevClass[b.severity]}"></div>
+      </div>
+      <div class="bug-meta">${sevIcon[b.severity]} ${b.severity} ${b.module?'· '+b.module:''} · ${b.createdAt}</div>
+      ${b.actual?`<div class="bug-desc">Atual: ${b.actual.substring(0,80)}${b.actual.length>80?'...':''}</div>`:''}
+    </div>
+  `).join('');
+}
+
+// ---- EXPORT ----
+function openExport() {
+  const lines = [];
+  lines.push('═══════════════════════════════════════════');
+  lines.push('         RELATÓRIO DE TESTES MANUAIS       ');
+  lines.push(`         Gerado em: ${new Date().toLocaleString('pt-BR')}`);
+  lines.push('═══════════════════════════════════════════\n');
+  state.flows.forEach((flow,fi) => {
+    lines.push(`FLUXO ${fi+1}: ${flow.name}`);
+    lines.push(`Módulos: ${flow.modules.join(', ')||'—'}`);
+    if (flow.desc) lines.push(`Contexto: ${flow.desc}`);
+    lines.push('─────────────────────────────────────────');
+    (flow.steps||[]).forEach((s,si) => {
+      const icon = {pending:'⏳',ok:'✅',bug:'🐛',blocked:'⛔'}[s.status]||'⏳';
+      lines.push(`  Passo ${si+1}: ${icon} ${s.title||'(sem título)'}`);
+      if (s.desc) lines.push(`    Detalhe: ${s.desc}`);
+      if (s.images&&s.images.length) lines.push(`    Evidências: ${s.images.length} imagem(ns) anexada(s)`);
+    });
+    const flowBugs = state.bugs.filter(b=>b.flowId===flow.id);
+    if (flowBugs.length) {
+      lines.push('\n  BUGS DESTE FLUXO:');
+      flowBugs.forEach((b,bi) => {
+        lines.push(`  Bug ${bi+1}: [${b.severity.toUpperCase()}] ${b.title}`);
+        if (b.module) lines.push(`    Módulo: ${b.module}`);
+        if (b.expected) lines.push(`    Esperado: ${b.expected}`);
+        if (b.actual) lines.push(`    Atual: ${b.actual}`);
+        if (b.steps) lines.push(`    Reprodução:\n      ${b.steps.split('\n').join('\n      ')}`);
+      });
+    }
+    lines.push('\n');
+  });
+  if (state.bugs.length) {
+    lines.push('═══════════════════════════════════════════');
+    lines.push('RESUMO GERAL DE BUGS');
+    lines.push(`Total: ${state.bugs.length} bug(s) registrado(s)`);
+    const bySev = {};
+    state.bugs.forEach(b => { bySev[b.severity]=(bySev[b.severity]||0)+1; });
+    Object.entries(bySev).forEach(([k,v]) => lines.push(`  ${sevIcon[k]} ${k}: ${v}`));
+  }
+  const text = lines.join('\n');
+  document.getElementById('export-content').style.whiteSpace='pre-wrap';
+  document.getElementById('export-content').textContent = text;
+  document.getElementById('modal-export').classList.add('open');
+}
+function copyReport() {
+  navigator.clipboard.writeText(document.getElementById('export-content').textContent);
+  toast('Relatório copiado!');
+}
+function downloadReport() {
+  const text = document.getElementById('export-content').textContent;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text],{type:'text/plain'}));
+  a.download = `relatorio-testes-${new Date().toISOString().split('T')[0]}.txt`;
+  a.click(); toast('Baixando...');
+}
+
+// ---- MODAL ----
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+</script>
+</body>
+</html>
