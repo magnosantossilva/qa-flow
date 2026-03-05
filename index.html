@@ -7,403 +7,367 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0f14;
-    --surface: #161a24;
-    --surface2: #1e2333;
-    --border: #2a3148;
-    --accent: #4fffb0;
-    --accent2: #ff6b6b;
-    --accent3: #ffd166;
-    --accent4: #74b9ff;
-    --text: #e8eaf0;
-    --muted: #7a82a0;
-    --radius: 10px;
+    --bg: #0d0f14; --surface: #161a24; --surface2: #1e2333; --border: #2a3148;
+    --accent: #4fffb0; --accent2: #ff6b6b; --accent3: #ffd166; --accent4: #74b9ff;
+    --text: #e8eaf0; --muted: #7a82a0; --radius: 10px;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Syne',sans-serif; min-height:100vh; overflow-x:hidden; }
 
-  /* HEADER */
+  /* ── AUTH SCREEN ── */
+  #auth-screen {
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh; background:var(--bg);
+    background-image: radial-gradient(ellipse at 30% 40%, rgba(79,255,176,.05) 0%, transparent 60%),
+                      radial-gradient(ellipse at 70% 60%, rgba(116,185,255,.05) 0%, transparent 60%);
+  }
+  .auth-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:36px; width:100%; max-width:400px;
+    animation: slideUp .3s ease;
+  }
+  @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .auth-logo { display:flex; align-items:center; gap:10px; font-size:1.4rem; font-weight:800; margin-bottom:28px; justify-content:center; }
+  .auth-logo-dot { width:12px; height:12px; border-radius:50%; background:var(--accent); box-shadow:0 0 14px var(--accent); }
+  .auth-tabs { display:flex; gap:0; margin-bottom:24px; background:var(--surface2); border-radius:10px; padding:4px; }
+  .auth-tab {
+    flex:1; padding:8px; text-align:center; border-radius:8px; cursor:pointer;
+    font-size:.85rem; font-weight:600; color:var(--muted); border:none; background:transparent; transition:all .2s;
+  }
+  .auth-tab.active { background:var(--accent); color:#0d0f14; }
+  .auth-form { display:flex; flex-direction:column; gap:14px; }
+  .auth-input {
+    background:var(--surface2); border:1px solid var(--border); color:var(--text);
+    font-family:'Syne'; font-size:.9rem; padding:12px 14px; border-radius:10px;
+    outline:none; transition:border-color .2s; width:100%;
+  }
+  .auth-input:focus { border-color:var(--accent); }
+  .auth-input::placeholder { color:var(--muted); }
+  .auth-btn {
+    background:var(--accent); color:#0d0f14; border:none; padding:12px;
+    border-radius:10px; font-family:'Syne'; font-size:.95rem; font-weight:700;
+    cursor:pointer; transition:all .2s; margin-top:4px;
+  }
+  .auth-btn:hover { background:#3de89d; transform:translateY(-1px); box-shadow:0 4px 20px rgba(79,255,176,.3); }
+  .auth-error { color:var(--accent2); font-size:.82rem; text-align:center; font-family:'JetBrains Mono'; }
+
+  /* ── MAIN APP ── */
+  #app-screen { display:none; }
   header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 32px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    position: sticky; top: 0; z-index: 100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 32px; border-bottom:1px solid var(--border);
+    background:var(--surface); position:sticky; top:0; z-index:100;
   }
-  .logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 800; }
-  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
-  .header-stats { display: flex; gap: 24px; }
+  .logo { display:flex; align-items:center; gap:10px; font-size:1.3rem; font-weight:800; }
+  .logo-dot { width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
+  .header-center { display:flex; gap:20px; }
   .stat-pill {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface2); border: 1px solid var(--border);
-    padding: 6px 14px; border-radius: 20px; font-size: .8rem; font-family: 'JetBrains Mono';
+    display:flex; align-items:center; gap:6px; background:var(--surface2);
+    border:1px solid var(--border); padding:5px 12px; border-radius:20px;
+    font-size:.78rem; font-family:'JetBrains Mono';
   }
-  .stat-pill span { color: var(--accent); font-weight: 600; }
+  .stat-pill span { color:var(--accent); font-weight:600; }
+  .header-right { display:flex; align-items:center; gap:10px; }
+  .user-chip {
+    display:flex; align-items:center; gap:8px; background:var(--surface2);
+    border:1px solid var(--border); padding:6px 12px; border-radius:20px; font-size:.82rem;
+  }
+  .user-avatar {
+    width:26px; height:26px; border-radius:50%; background:var(--accent);
+    color:#0d0f14; display:flex; align-items:center; justify-content:center;
+    font-size:.72rem; font-weight:800;
+  }
+  .btn {
+    padding:8px 14px; border-radius:var(--radius); border:none; cursor:pointer;
+    font-family:'Syne'; font-size:.82rem; font-weight:600;
+    display:flex; align-items:center; gap:6px; transition:all .2s;
+  }
+  .btn-primary { background:var(--accent); color:#0d0f14; }
+  .btn-primary:hover { background:#3de89d; transform:translateY(-1px); }
+  .btn-ghost { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-danger { background:rgba(255,107,107,.15); color:var(--accent2); border:1px solid rgba(255,107,107,.3); }
+  .btn-danger:hover { background:rgba(255,107,107,.25); }
+  .btn-sm { padding:5px 10px; font-size:.75rem; }
 
-  /* MAIN LAYOUT */
-  .app { display: grid; grid-template-columns: 280px 1fr 340px; height: calc(100vh - 61px); }
+  .app { display:grid; grid-template-columns:270px 1fr 340px; height:calc(100vh - 57px); }
 
   /* SIDEBAR */
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    overflow: hidden;
-  }
-  .sidebar-header {
-    padding: 20px; border-bottom: 1px solid var(--border);
-    font-size: .75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted);
-  }
-  .sidebar-actions { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-  .btn {
-    padding: 10px 16px; border-radius: var(--radius);
-    border: none; cursor: pointer; font-family: 'Syne'; font-size: .85rem; font-weight: 600;
-    display: flex; align-items: center; gap: 8px; transition: all .2s;
-  }
-  .btn-primary { background: var(--accent); color: #0d0f14; }
-  .btn-primary:hover { background: #3de89d; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(79,255,176,.3); }
-  .btn-danger { background: rgba(255,107,107,.15); color: var(--accent2); border: 1px solid rgba(255,107,107,.3); }
-  .btn-danger:hover { background: rgba(255,107,107,.25); }
-  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .sidebar { background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+  .sidebar-header { padding:16px 18px; border-bottom:1px solid var(--border); font-size:.72rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); }
+  .sidebar-actions { padding:12px 16px; }
+  .flows-list { flex:1; overflow-y:auto; padding:0 12px 12px; }
+  .flow-item { padding:11px 12px; border-radius:var(--radius); margin-bottom:5px; cursor:pointer; border:1px solid transparent; transition:all .2s; }
+  .flow-item:hover { background:var(--surface2); border-color:var(--border); }
+  .flow-item.active { background:rgba(79,255,176,.08); border-color:rgba(79,255,176,.3); }
+  .flow-name { font-weight:600; font-size:.88rem; margin-bottom:3px; }
+  .flow-meta { display:flex; gap:6px; font-size:.72rem; color:var(--muted); font-family:'JetBrains Mono'; flex-wrap:wrap; }
+  .badge { padding:2px 7px; border-radius:10px; font-size:.68rem; font-weight:600; font-family:'JetBrains Mono'; }
+  .badge-ok { background:rgba(79,255,176,.15); color:var(--accent); }
+  .badge-bug { background:rgba(255,107,107,.15); color:var(--accent2); }
 
-  .flows-list { flex: 1; overflow-y: auto; padding: 0 16px 16px; }
-  .flow-item {
-    padding: 12px 14px; border-radius: var(--radius); margin-bottom: 6px;
-    cursor: pointer; border: 1px solid transparent; transition: all .2s;
-  }
-  .flow-item:hover { background: var(--surface2); border-color: var(--border); }
-  .flow-item.active { background: rgba(79,255,176,.08); border-color: rgba(79,255,176,.3); }
-  .flow-name { font-weight: 600; font-size: .9rem; margin-bottom: 4px; }
-  .flow-meta { display: flex; gap: 8px; font-size: .75rem; color: var(--muted); font-family: 'JetBrains Mono'; }
-  .badge {
-    padding: 2px 8px; border-radius: 10px; font-size: .7rem; font-weight: 600; font-family: 'JetBrains Mono';
-  }
-  .badge-ok { background: rgba(79,255,176,.15); color: var(--accent); }
-  .badge-bug { background: rgba(255,107,107,.15); color: var(--accent2); }
-  .badge-warn { background: rgba(255,209,102,.15); color: var(--accent3); }
+  /* MAIN */
+  .main { overflow-y:auto; background:var(--bg); }
+  .main-inner { padding:24px 28px; max-width:900px; }
+  .section-title { font-size:1.3rem; font-weight:800; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+  .section-sub { color:var(--muted); font-size:.82rem; margin-bottom:6px; font-family:'JetBrains Mono'; }
 
-  /* MAIN CONTENT */
-  .main { overflow-y: auto; background: var(--bg); }
-  .main-inner { padding: 28px 32px; max-width: 900px; }
-
-  .section-title {
-    font-size: 1.4rem; font-weight: 800; margin-bottom: 6px;
-    display: flex; align-items: center; gap: 10px;
+  /* AUDIT TAG */
+  .audit-tag {
+    display:inline-flex; align-items:center; gap:5px;
+    background:rgba(116,185,255,.08); border:1px solid rgba(116,185,255,.15);
+    padding:2px 8px; border-radius:6px; font-size:.7rem; font-family:'JetBrains Mono'; color:var(--accent4);
+    margin-bottom:16px;
   }
-  .section-sub { color: var(--muted); font-size: .85rem; margin-bottom: 24px; font-family: 'JetBrains Mono'; }
+  .audit-tag .dot { width:6px; height:6px; border-radius:50%; background:var(--accent4); }
 
   /* STEPS */
-  .steps-area { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-  .step-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); overflow: hidden; transition: border-color .2s;
-  }
-  .step-card:hover { border-color: var(--accent4); }
-  .step-header {
-    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
-    border-bottom: 1px solid var(--border); cursor: pointer;
-  }
-  .step-num {
-    width: 28px; height: 28px; border-radius: 8px;
-    background: var(--surface2); display: flex; align-items: center; justify-content: center;
-    font-size: .8rem; font-weight: 700; font-family: 'JetBrains Mono';
-    flex-shrink: 0; color: var(--accent4);
-  }
-  .step-title-input {
-    flex: 1; background: transparent; border: none; color: var(--text);
-    font-family: 'Syne'; font-size: .9rem; font-weight: 600; outline: none;
-  }
-  .step-title-input::placeholder { color: var(--muted); }
-  .step-status-btn {
-    padding: 4px 10px; border-radius: 6px; border: none; cursor: pointer;
-    font-family: 'JetBrains Mono'; font-size: .72rem; font-weight: 600; transition: all .2s;
-  }
-  .status-pending { background: rgba(122,130,160,.15); color: var(--muted); }
-  .status-ok { background: rgba(79,255,176,.15); color: var(--accent); }
-  .status-bug { background: rgba(255,107,107,.15); color: var(--accent2); }
-  .status-blocked { background: rgba(255,209,102,.15); color: var(--accent3); }
+  .steps-area { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+  .step-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:border-color .2s; }
+  .step-card:hover { border-color:var(--accent4); }
+  .step-header { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border); }
+  .step-num { width:26px; height:26px; border-radius:7px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; font-family:'JetBrains Mono'; flex-shrink:0; color:var(--accent4); }
+  .step-title-input { flex:1; background:transparent; border:none; color:var(--text); font-family:'Syne'; font-size:.88rem; font-weight:600; outline:none; }
+  .step-title-input::placeholder { color:var(--muted); }
+  .step-status-btn { padding:3px 9px; border-radius:6px; border:none; cursor:pointer; font-family:'JetBrains Mono'; font-size:.7rem; font-weight:600; transition:all .2s; flex-shrink:0; }
+  .status-pending { background:rgba(122,130,160,.15); color:var(--muted); }
+  .status-ok { background:rgba(79,255,176,.15); color:var(--accent); }
+  .status-bug { background:rgba(255,107,107,.15); color:var(--accent2); }
+  .status-blocked { background:rgba(255,209,102,.15); color:var(--accent3); }
+  .step-body { padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+  .step-desc { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'JetBrains Mono'; font-size:.8rem; padding:9px 11px; border-radius:8px; resize:vertical; min-height:55px; outline:none; transition:border-color .2s; }
+  .step-desc:focus { border-color:var(--accent4); }
+  .step-desc::placeholder { color:var(--muted); }
+  .step-audit { display:flex; flex-wrap:wrap; gap:6px; margin-top:2px; }
+  .step-audit-item { display:flex; align-items:center; gap:4px; font-size:.68rem; font-family:'JetBrains Mono'; color:var(--muted); background:var(--surface2); border:1px solid var(--border); padding:2px 7px; border-radius:5px; }
+  .step-audit-item b { color:var(--accent4); }
 
-  .step-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
-  .step-desc {
-    width: 100%; background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); font-family: 'JetBrains Mono'; font-size: .82rem;
-    padding: 10px 12px; border-radius: 8px; resize: vertical; min-height: 60px;
-    outline: none; transition: border-color .2s;
-  }
-  .step-desc:focus { border-color: var(--accent4); }
-  .step-desc::placeholder { color: var(--muted); }
+  .screenshot-zone { border:2px dashed var(--border); border-radius:8px; padding:12px; text-align:center; cursor:pointer; transition:all .2s; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.8rem; color:var(--muted); }
+  .screenshot-zone:hover { border-color:var(--accent4); color:var(--accent4); background:rgba(116,185,255,.05); }
+  .screenshot-zone input { display:none; }
+  .screenshot-preview { display:flex; flex-wrap:wrap; gap:6px; }
+  .screenshot-thumb { position:relative; width:72px; height:54px; border-radius:6px; overflow:hidden; border:1px solid var(--border); cursor:pointer; }
+  .screenshot-thumb img { width:100%; height:100%; object-fit:cover; }
+  .screenshot-thumb .del-img { position:absolute; top:2px; right:2px; background:rgba(255,107,107,.9); border:none; border-radius:3px; color:white; font-size:.6rem; cursor:pointer; padding:2px 4px; display:none; }
+  .screenshot-thumb:hover .del-img { display:block; }
 
-  .screenshot-zone {
-    border: 2px dashed var(--border); border-radius: 8px; padding: 16px;
-    text-align: center; cursor: pointer; transition: all .2s;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    font-size: .82rem; color: var(--muted);
-  }
-  .screenshot-zone:hover { border-color: var(--accent4); color: var(--accent4); background: rgba(116,185,255,.05); }
-  .screenshot-zone input { display: none; }
-  .screenshot-preview {
-    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
-  }
-  .screenshot-thumb {
-    position: relative; width: 80px; height: 60px;
-    border-radius: 6px; overflow: hidden; border: 1px solid var(--border);
-    cursor: pointer;
-  }
-  .screenshot-thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .screenshot-thumb .del-img {
-    position: absolute; top: 2px; right: 2px;
-    background: rgba(255,107,107,.9); border: none; border-radius: 4px;
-    color: white; font-size: .65rem; cursor: pointer; padding: 2px 4px;
-    display: none;
-  }
-  .screenshot-thumb:hover .del-img { display: block; }
+  .add-step-btn { width:100%; padding:10px; border-radius:var(--radius); border:2px dashed var(--border); background:transparent; color:var(--muted); font-family:'Syne'; font-size:.83rem; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .add-step-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(79,255,176,.05); }
+  .remove-step { background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:.95rem; padding:3px; border-radius:5px; transition:all .2s; }
+  .remove-step:hover { color:var(--accent2); background:rgba(255,107,107,.1); }
 
-  .add-step-btn {
-    width: 100%; padding: 12px; border-radius: var(--radius);
-    border: 2px dashed var(--border); background: transparent;
-    color: var(--muted); font-family: 'Syne'; font-size: .85rem;
-    cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .add-step-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,255,176,.05); }
+  /* PANEL */
+  .panel { background:var(--surface); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+  .panel-tabs { display:flex; border-bottom:1px solid var(--border); }
+  .panel-tab { flex:1; padding:12px 6px; text-align:center; cursor:pointer; font-size:.78rem; font-weight:600; color:var(--muted); border:none; background:transparent; transition:all .2s; border-bottom:2px solid transparent; }
+  .panel-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .panel-body { flex:1; overflow-y:auto; padding:14px; }
 
-  /* BUG PANEL */
-  .panel {
-    background: var(--surface); border-left: 1px solid var(--border);
-    display: flex; flex-direction: column; overflow: hidden;
-  }
-  .panel-tabs { display: flex; border-bottom: 1px solid var(--border); }
-  .panel-tab {
-    flex: 1; padding: 14px; text-align: center; cursor: pointer;
-    font-size: .82rem; font-weight: 600; color: var(--muted); border: none;
-    background: transparent; transition: all .2s; border-bottom: 2px solid transparent;
-  }
-  .panel-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .panel-body { flex: 1; overflow-y: auto; padding: 16px; }
+  .bug-form { display:flex; flex-direction:column; gap:10px; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-label { font-size:.72rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
+  .form-input,.form-select,.form-textarea { background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'JetBrains Mono'; font-size:.8rem; padding:8px 11px; border-radius:8px; outline:none; transition:border-color .2s; width:100%; }
+  .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--accent); }
+  .form-textarea { resize:vertical; min-height:70px; }
+  .form-select option { background:var(--surface2); }
 
-  .bug-form { display: flex; flex-direction: column; gap: 12px; }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-label { font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .form-input, .form-select, .form-textarea {
-    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
-    font-family: 'JetBrains Mono'; font-size: .82rem; padding: 9px 12px;
-    border-radius: 8px; outline: none; transition: border-color .2s; width: 100%;
-  }
-  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
-  .form-textarea { resize: vertical; min-height: 80px; }
-  .form-select option { background: var(--surface2); }
+  .bugs-list { display:flex; flex-direction:column; gap:8px; }
+  .bug-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:11px; transition:border-color .2s; cursor:pointer; }
+  .bug-card:hover { border-color:var(--accent2); }
+  .bug-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; }
+  .bug-title { font-size:.85rem; font-weight:600; }
+  .severity-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:3px; }
+  .sev-critical { background:#ff4757; box-shadow:0 0 8px #ff4757; }
+  .sev-high { background:var(--accent2); }
+  .sev-medium { background:var(--accent3); }
+  .sev-low { background:var(--accent4); }
+  .bug-meta { font-size:.72rem; color:var(--muted); font-family:'JetBrains Mono'; margin-bottom:4px; }
+  .bug-desc { font-size:.78rem; color:var(--muted); line-height:1.5; }
+  .bug-audit { font-size:.68rem; font-family:'JetBrains Mono'; color:var(--accent4); margin-top:5px; opacity:.8; }
 
-  .bugs-list { display: flex; flex-direction: column; gap: 10px; }
-  .bug-card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 12px; transition: border-color .2s;
-    cursor: pointer;
-  }
-  .bug-card:hover { border-color: var(--accent2); }
-  .bug-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-  .bug-title { font-size: .88rem; font-weight: 600; }
-  .severity-dot {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
-  }
-  .sev-critical { background: #ff4757; box-shadow: 0 0 8px #ff4757; }
-  .sev-high { background: var(--accent2); }
-  .sev-medium { background: var(--accent3); }
-  .sev-low { background: var(--accent4); }
-  .bug-meta { font-size: .75rem; color: var(--muted); font-family: 'JetBrains Mono'; margin-bottom: 6px; }
-  .bug-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+  /* HISTORY PANEL */
+  .history-item { padding:10px 0; border-bottom:1px solid var(--border); }
+  .history-item:last-child { border-bottom:none; }
+  .history-action { font-size:.8rem; font-weight:600; margin-bottom:3px; }
+  .history-meta { font-size:.7rem; font-family:'JetBrains Mono'; color:var(--muted); }
+  .history-user { color:var(--accent4); font-weight:600; }
+  .history-icon { font-size:.9rem; margin-right:4px; }
 
   /* MODAL */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.7);
-    display: none; align-items: center; justify-content: center; z-index: 1000;
-    backdrop-filter: blur(4px);
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; width: 90%; max-width: 620px; max-height: 90vh;
-    overflow-y: auto; padding: 28px;
-    animation: slideUp .25s ease;
-  }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; }
-  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:center; justify-content:center; z-index:1000; backdrop-filter:blur(4px); }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--surface); border:1px solid var(--border); border-radius:14px; width:90%; max-width:580px; max-height:90vh; overflow-y:auto; padding:26px; animation:slideUp .25s ease; }
+  .modal-title { font-size:1.1rem; font-weight:800; margin-bottom:18px; }
+  .modal-actions { display:flex; gap:8px; margin-top:18px; justify-content:flex-end; }
 
-  /* EXPORT */
-  .export-preview {
-    background: white; color: #1a1a2e; padding: 32px;
-    font-family: 'JetBrains Mono'; font-size: .8rem; line-height: 1.8;
-    border-radius: var(--radius); max-height: 400px; overflow-y: auto;
-    border: 1px solid var(--border);
-  }
-
-  /* EMPTY STATE */
-  .empty-state {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 60px 20px; color: var(--muted); text-align: center; gap: 12px;
-  }
-  .empty-icon { font-size: 3rem; opacity: .4; }
-
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* TOAST */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: var(--surface); border: 1px solid var(--accent);
-    color: var(--accent); padding: 12px 20px; border-radius: var(--radius);
-    font-size: .85rem; font-weight: 600; z-index: 9999;
-    transform: translateY(20px); opacity: 0; transition: all .3s;
-    pointer-events: none;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-
-  .step-card .remove-step {
-    background: transparent; border: none; color: var(--muted);
-    cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 6px;
-    transition: all .2s;
-  }
-  .step-card .remove-step:hover { color: var(--accent2); background: rgba(255,107,107,.1); }
-
-  .flow-tag {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: rgba(116,185,255,.1); color: var(--accent4); border: 1px solid rgba(116,185,255,.2);
-    padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-family: 'JetBrains Mono';
-    cursor: pointer; transition: all .2s;
-  }
-  .flow-tag:hover { background: rgba(116,185,255,.2); }
-  .tags-area { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .export-preview { background:white; color:#1a1a2e; padding:28px; font-family:'JetBrains Mono'; font-size:.78rem; line-height:1.8; border-radius:var(--radius); max-height:380px; overflow-y:auto; border:1px solid var(--border); }
+  .flow-tag { display:inline-flex; align-items:center; gap:4px; background:rgba(116,185,255,.1); color:var(--accent4); border:1px solid rgba(116,185,255,.2); padding:3px 10px; border-radius:20px; font-size:.72rem; font-family:'JetBrains Mono'; cursor:pointer; transition:all .2s; }
+  .flow-tag:hover { background:rgba(116,185,255,.2); }
+  .tags-area { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:50px 20px; color:var(--muted); text-align:center; gap:10px; }
+  .empty-icon { font-size:2.5rem; opacity:.4; }
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+  .toast { position:fixed; bottom:20px; right:20px; background:var(--surface); border:1px solid var(--accent); color:var(--accent); padding:10px 18px; border-radius:var(--radius); font-size:.83rem; font-weight:600; z-index:9999; transform:translateY(20px); opacity:0; transition:all .3s; pointer-events:none; }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .saving-indicator { font-size:.7rem; font-family:'JetBrains Mono'; color:var(--muted); display:flex; align-items:center; gap:4px; }
+  .saving-dot { width:6px; height:6px; border-radius:50%; background:var(--accent3); animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo"><div class="logo-dot"></div> QA Flow</div>
-  <div class="header-stats">
-    <div class="stat-pill">Fluxos: <span id="total-flows">0</span></div>
-    <div class="stat-pill">Passos: <span id="total-steps">0</span></div>
-    <div class="stat-pill">Bugs: <span id="total-bugs">0</span></div>
+<!-- ══ TELA DE LOGIN ══ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="auth-logo-dot"></div> QA Flow</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="showAuthTab('login')">Entrar</button>
+      <button class="auth-tab" id="tab-register" onclick="showAuthTab('register')">Criar conta</button>
+    </div>
+    <div class="auth-form" id="login-form">
+      <input class="auth-input" id="login-email" type="email" placeholder="E-mail">
+      <input class="auth-input" id="login-password" type="password" placeholder="Senha">
+      <div class="auth-error" id="login-error"></div>
+      <button class="auth-btn" onclick="doLogin()">Entrar</button>
+    </div>
+    <div class="auth-form" id="register-form" style="display:none;">
+      <input class="auth-input" id="reg-name" placeholder="Seu nome (ex: Ana Silva)">
+      <input class="auth-input" id="reg-email" type="email" placeholder="E-mail">
+      <input class="auth-input" id="reg-password" type="password" placeholder="Senha (mínimo 6 caracteres)">
+      <div class="auth-error" id="register-error"></div>
+      <button class="auth-btn" onclick="doRegister()">Criar conta</button>
+    </div>
   </div>
-  <button class="btn btn-ghost" onclick="openExport()" style="font-size:.82rem;padding:8px 16px;">⬇ Exportar Relatório</button>
-</header>
+</div>
 
-<div class="app">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-header">Fluxos de Teste</div>
-    <div class="sidebar-actions">
-      <button class="btn btn-primary" onclick="openNewFlow()">+ Novo Fluxo</button>
+<!-- ══ APP PRINCIPAL ══ -->
+<div id="app-screen">
+  <header>
+    <div class="logo"><div class="logo-dot"></div> QA Flow</div>
+    <div class="header-center">
+      <div class="stat-pill">Fluxos: <span id="total-flows">0</span></div>
+      <div class="stat-pill">Passos: <span id="total-steps">0</span></div>
+      <div class="stat-pill">Bugs: <span id="total-bugs">0</span></div>
     </div>
-    <div class="flows-list" id="flows-list">
-      <div class="empty-state"><div class="empty-icon">🗂</div><div>Crie seu primeiro fluxo de teste</div></div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-    <div class="main-inner" id="main-content">
-      <div class="empty-state" style="margin-top:80px;">
-        <div class="empty-icon">🧪</div>
-        <div style="font-size:1.1rem;font-weight:700;">Selecione ou crie um fluxo</div>
-        <div style="font-size:.85rem;">Mapeie os passos do teste, capture telas e registre bugs</div>
+    <div class="header-right">
+      <div class="saving-indicator" id="saving-indicator" style="display:none;"><div class="saving-dot"></div> salvando...</div>
+      <button class="btn btn-ghost" onclick="openExport()" style="font-size:.78rem;">⬇ Exportar</button>
+      <div class="user-chip">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <span id="user-name-display">—</span>
       </div>
+      <button class="btn btn-ghost" onclick="doLogout()" style="font-size:.78rem;">Sair</button>
     </div>
-  </main>
+  </header>
 
-  <!-- PANEL -->
-  <aside class="panel">
-    <div class="panel-tabs">
-      <button class="panel-tab active" onclick="switchTab('bugs')" id="tab-bugs">🐛 Bugs</button>
-      <button class="panel-tab" onclick="switchTab('report')" id="tab-report">📋 Relato</button>
-    </div>
-    <div class="panel-body" id="panel-bugs">
-      <div class="bug-form" id="bug-form" style="margin-bottom:20px;">
-        <div style="font-size:.82rem;font-weight:700;color:var(--accent2);margin-bottom:4px;">Registrar Bug</div>
-        <div class="form-group">
-          <label class="form-label">Título do Bug</label>
-          <input class="form-input" id="bug-title" placeholder="Ex: Produto não atualiza estoque após saída">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Módulo Afetado</label>
-          <select class="form-select" id="bug-module">
-            <option value="">Selecionar módulo...</option>
-            <option>Produto</option>
-            <option>Entrada</option>
-            <option>Estoque</option>
-            <option>Saída</option>
-            <option>Devolução</option>
-            <option>Financeiro</option>
-            <option>Relatório</option>
-            <option>Outro</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Severidade</label>
-          <select class="form-select" id="bug-severity">
-            <option value="critical">🔴 Crítico — Sistema parado</option>
-            <option value="high">🟠 Alto — Funcionalidade quebrada</option>
-            <option value="medium" selected>🟡 Médio — Impacto parcial</option>
-            <option value="low">🔵 Baixo — Cosmético / menor</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Comportamento Esperado</label>
-          <textarea class="form-textarea" id="bug-expected" placeholder="O que deveria acontecer?"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Comportamento Atual</label>
-          <textarea class="form-textarea" id="bug-actual" placeholder="O que está acontecendo de errado?"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Passo a Passo para Reproduzir</label>
-          <textarea class="form-textarea" id="bug-steps" placeholder="1. Acesse o módulo de Saída&#10;2. Informe o produto X&#10;3. Confirme a saída&#10;4. Verifique o estoque..." style="min-height:100px;"></textarea>
-        </div>
-        <button class="btn btn-danger" onclick="saveBug()" style="width:100%;justify-content:center;">
-          🐛 Registrar Bug
-        </button>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">Fluxos de Teste</div>
+      <div class="sidebar-actions">
+        <button class="btn btn-primary" onclick="openNewFlow()" style="width:100%;justify-content:center;">+ Novo Fluxo</button>
       </div>
-      <div id="bugs-list-container">
-        <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Bugs Registrados</div>
+      <div class="flows-list" id="flows-list">
+        <div class="empty-state"><div class="empty-icon">🗂</div><div>Crie seu primeiro fluxo</div></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-inner" id="main-content">
+        <div class="empty-state" style="margin-top:80px;">
+          <div class="empty-icon">🧪</div>
+          <div style="font-size:1.05rem;font-weight:700;">Selecione ou crie um fluxo</div>
+          <div style="font-size:.83rem;">Mapeie os passos, capture evidências e registre bugs</div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="panel">
+      <div class="panel-tabs">
+        <button class="panel-tab active" onclick="switchTab('bugs')" id="tab-bugs">🐛 Bugs</button>
+        <button class="panel-tab" onclick="switchTab('history')" id="tab-history">📜 Histórico</button>
+        <button class="panel-tab" onclick="switchTab('report')" id="tab-report">📋 Relato</button>
+      </div>
+
+      <!-- BUGS -->
+      <div class="panel-body" id="panel-bugs">
+        <div class="bug-form" style="margin-bottom:18px;">
+          <div style="font-size:.8rem;font-weight:700;color:var(--accent2);margin-bottom:2px;">Registrar Bug</div>
+          <div class="form-group">
+            <label class="form-label">Título do Bug</label>
+            <input class="form-input" id="bug-title" placeholder="Ex: Estoque não atualiza após saída">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Módulo Afetado</label>
+            <select class="form-select" id="bug-module">
+              <option value="">Selecionar módulo...</option>
+              <option>Produto</option><option>Entrada</option><option>Estoque</option>
+              <option>Saída</option><option>Devolução</option><option>Financeiro</option>
+              <option>Relatório</option><option>Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Severidade</label>
+            <select class="form-select" id="bug-severity">
+              <option value="critical">🔴 Crítico — Sistema parado</option>
+              <option value="high">🟠 Alto — Funcionalidade quebrada</option>
+              <option value="medium" selected>🟡 Médio — Impacto parcial</option>
+              <option value="low">🔵 Baixo — Cosmético / menor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Comportamento Esperado</label>
+            <textarea class="form-textarea" id="bug-expected" placeholder="O que deveria acontecer?"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Comportamento Atual</label>
+            <textarea class="form-textarea" id="bug-actual" placeholder="O que está acontecendo de errado?"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Passo a Passo para Reproduzir</label>
+            <textarea class="form-textarea" id="bug-steps" placeholder="1. Acesse o módulo&#10;2. Informe o produto&#10;3. Confirme e observe..." style="min-height:80px;"></textarea>
+          </div>
+          <button class="btn btn-danger" onclick="saveBug()" style="width:100%;justify-content:center;">🐛 Registrar Bug</button>
+        </div>
+        <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Bugs deste Fluxo</div>
         <div class="bugs-list" id="bugs-list">
-          <div style="color:var(--muted);font-size:.82rem;text-align:center;padding:20px;">Nenhum bug registrado</div>
+          <div style="color:var(--muted);font-size:.8rem;text-align:center;padding:18px;">Nenhum bug registrado</div>
         </div>
       </div>
-    </div>
-    <div class="panel-body" id="panel-report" style="display:none;">
-      <div style="font-size:.82rem;font-weight:700;color:var(--accent4);margin-bottom:12px;">Modelo de Relato de Bug</div>
-      <div style="font-size:.8rem;color:var(--muted);line-height:1.7;font-family:'JetBrains Mono';">
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;">
-          <div style="color:var(--accent);margin-bottom:8px;font-weight:600;"># Estrutura Ideal de Bug Report</div>
-          <div><b style="color:var(--text);">Título:</b> [Módulo] Descrição curta e direta</div><br>
-          <div><b style="color:var(--text);">Ambiente:</b> Versão / Navegador / OS</div><br>
-          <div><b style="color:var(--text);">Severidade:</b> Crítico / Alto / Médio / Baixo</div><br>
-          <div><b style="color:var(--text);">Comportamento Esperado:</b><br>Descreva o que o sistema deveria fazer.</div><br>
-          <div><b style="color:var(--text);">Comportamento Atual:</b><br>Descreva o que está acontecendo de errado.</div><br>
-          <div><b style="color:var(--text);">Passos para Reproduzir:</b><br>1. Acesse...<br>2. Clique em...<br>3. Observe que...</div><br>
-          <div><b style="color:var(--text);">Evidência:</b> Print / Vídeo anexado</div>
-        </div>
-        <div style="background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);border-radius:8px;padding:12px;">
-          <div style="color:var(--accent2);margin-bottom:6px;font-weight:600;">⚠ Evite no título:</div>
-          <div>❌ "Está quebrando"</div>
-          <div>❌ "Bug no sistema"</div>
-          <div>❌ "Não funciona"</div>
-          <div style="color:var(--accent);margin-top:8px;margin-bottom:6px;font-weight:600;">✅ Prefira:</div>
-          <div>✅ "[Estoque] Qty não decrementa após confirmar saída"</div>
-          <div>✅ "[Produto] Cadastro aceita preço negativo sem validação"</div>
+
+      <!-- HISTÓRICO -->
+      <div class="panel-body" id="panel-history" style="display:none;">
+        <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;">Histórico de Alterações</div>
+        <div id="history-list">
+          <div style="color:var(--muted);font-size:.8rem;text-align:center;padding:18px;">Selecione um fluxo para ver o histórico</div>
         </div>
       </div>
-    </div>
-  </aside>
+
+      <!-- RELATO -->
+      <div class="panel-body" id="panel-report" style="display:none;">
+        <div style="font-size:.8rem;font-weight:700;color:var(--accent4);margin-bottom:10px;">Modelo de Relato de Bug</div>
+        <div style="font-size:.78rem;color:var(--muted);line-height:1.7;font-family:'JetBrains Mono';">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">
+            <div style="color:var(--accent);margin-bottom:6px;font-weight:600;"># Estrutura Ideal</div>
+            <div><b style="color:var(--text);">Título:</b> [Módulo] Descrição curta</div><br>
+            <div><b style="color:var(--text);">Ambiente:</b> Versão / Navegador / OS</div><br>
+            <div><b style="color:var(--text);">Severidade:</b> Crítico / Alto / Médio / Baixo</div><br>
+            <div><b style="color:var(--text);">Esperado:</b> O que deveria ocorrer</div><br>
+            <div><b style="color:var(--text);">Atual:</b> O que está errado</div><br>
+            <div><b style="color:var(--text);">Reprodução:</b> 1. ... 2. ... 3. ...</div><br>
+            <div><b style="color:var(--text);">Evidência:</b> Print / Vídeo</div>
+          </div>
+          <div style="background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);border-radius:8px;padding:10px;">
+            <div style="color:var(--accent2);margin-bottom:5px;font-weight:600;">⚠ Evite:</div>
+            <div>❌ "Está quebrando" / "Não funciona"</div>
+            <div style="color:var(--accent);margin-top:6px;margin-bottom:4px;font-weight:600;">✅ Prefira:</div>
+            <div>✅ "[Estoque] Qty não decrementa após saída"</div>
+            <div>✅ "[Produto] Aceita preço negativo sem validar"</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
 </div>
 
 <!-- MODAL NOVO FLUXO -->
@@ -413,7 +377,7 @@
     <div class="bug-form">
       <div class="form-group">
         <label class="form-label">Nome do Fluxo</label>
-        <input class="form-input" id="new-flow-name" placeholder="Ex: Alteração de Produto - Impacto em Módulos">
+        <input class="form-input" id="new-flow-name" placeholder="Ex: Alteração de Produto — Impacto nos Módulos">
       </div>
       <div class="form-group">
         <label class="form-label">Módulos Envolvidos</label>
@@ -429,7 +393,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Descrição / Contexto da Mudança</label>
-        <textarea class="form-textarea" id="new-flow-desc" placeholder="Ex: Após alteração no cadastro de produto (código/unidade), validar impacto em todos os módulos relacionados..."></textarea>
+        <textarea class="form-textarea" id="new-flow-desc" placeholder="Ex: Após alteração no cadastro de produto, validar impacto em todos os módulos relacionados..."></textarea>
       </div>
     </div>
     <div class="modal-actions">
@@ -441,12 +405,12 @@
 
 <!-- MODAL EXPORT -->
 <div class="modal-overlay" id="modal-export">
-  <div class="modal" style="max-width:720px;">
+  <div class="modal" style="max-width:700px;">
     <div class="modal-title">Exportar Relatório de Testes</div>
     <div id="export-content" class="export-preview"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modal-export')">Fechar</button>
-      <button class="btn btn-primary" onclick="copyReport()">📋 Copiar Relatório</button>
+      <button class="btn btn-primary" onclick="copyReport()">📋 Copiar</button>
       <button class="btn btn-ghost" onclick="downloadReport()">⬇ Baixar .txt</button>
     </div>
   </div>
@@ -462,82 +426,94 @@
 <div class="toast" id="toast"></div>
 
 <script>
-window.state = {
-  flows: [],
-  activeFlow: null,
-  bugs: []
-};
+// ══ STATE ══
+window.state = { flows:[], bugs:[], history:[], activeFlow:null };
 let state = window.state;
+let currentUser = null; // { uid, email, displayName }
 
-// ---- UTIL ----
+// ══ UTIL ══
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+  setTimeout(() => t.classList.remove('show'), 2400);
 }
 window.toast = toast;
 function uid() { return '_' + Math.random().toString(36).substr(2,9); }
+function now() { return new Date().toLocaleString('pt-BR'); }
+function userTag() { return currentUser ? currentUser.displayName || currentUser.email.split('@')[0] : '?'; }
+function initials(name) { return name ? name.split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2) : '?'; }
+function showSaving(on) {
+  document.getElementById('saving-indicator').style.display = on ? 'flex' : 'none';
+}
+
 function updateHeaderStats() {
   document.getElementById('total-flows').textContent = state.flows.length;
-  const steps = state.flows.reduce((a,f) => a + (f.steps||[]).length, 0);
+  const steps = state.flows.reduce((a,f) => a+(f.steps||[]).length, 0);
   document.getElementById('total-steps').textContent = steps;
   document.getElementById('total-bugs').textContent = state.bugs.length;
-  // Salva na nuvem sempre que os stats mudam
   if (window.saveToCloud) window.saveToCloud();
 }
 window.updateHeaderStats = updateHeaderStats;
 
-// ---- TABS ----
-function switchTab(tab) {
-  document.getElementById('panel-bugs').style.display = tab==='bugs'?'':'none';
-  document.getElementById('panel-report').style.display = tab==='report'?'':'none';
-  document.getElementById('tab-bugs').classList.toggle('active', tab==='bugs');
-  document.getElementById('tab-report').classList.toggle('active', tab==='report');
+// ══ AUTH UI ══
+function showAuthTab(tab) {
+  document.getElementById('login-form').style.display = tab==='login'?'flex':'none';
+  document.getElementById('register-form').style.display = tab==='register'?'flex':'none';
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
 }
 
-// ---- FLOW ----
+// ══ TABS ══
+function switchTab(tab) {
+  ['bugs','history','report'].forEach(t => {
+    document.getElementById('panel-'+t).style.display = t===tab?'':'none';
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+// ══ FLOWS ══
 let selectedTags = [];
 function toggleTag(el, tag) {
   const idx = selectedTags.indexOf(tag);
-  if (idx >= 0) { selectedTags.splice(idx,1); el.style.background=''; el.style.color=''; el.textContent = '+ '+tag; }
-  else { selectedTags.push(tag); el.style.background='rgba(116,185,255,.25)'; el.style.color='#fff'; el.textContent = '✓ '+tag; }
+  if (idx>=0) { selectedTags.splice(idx,1); el.style.background=''; el.style.color=''; el.textContent='+ '+tag; }
+  else { selectedTags.push(tag); el.style.background='rgba(116,185,255,.25)'; el.style.color='#fff'; el.textContent='✓ '+tag; }
 }
-
 function openNewFlow() {
-  selectedTags = [];
+  selectedTags=[];
   document.getElementById('new-flow-name').value='';
   document.getElementById('new-flow-desc').value='';
-  document.querySelectorAll('#tags-area .flow-tag').forEach(t => { t.style.background=''; t.style.color=''; t.textContent = '+ '+t.textContent.replace(/[✓+ ]/g,''); });
+  document.querySelectorAll('#tags-area .flow-tag').forEach(t => { t.style.background=''; t.style.color=''; t.textContent='+ '+t.textContent.replace(/[✓+ ]/g,''); });
   document.getElementById('modal-new-flow').classList.add('open');
 }
 function createFlow() {
   const name = document.getElementById('new-flow-name').value.trim();
   if (!name) { toast('Dê um nome ao fluxo'); return; }
   const flow = {
-    id: uid(), name, desc: document.getElementById('new-flow-desc').value,
-    modules: [...selectedTags], steps: [], createdAt: new Date().toLocaleDateString('pt-BR')
+    id:uid(), name, desc:document.getElementById('new-flow-desc').value,
+    modules:[...selectedTags], steps:[],
+    createdAt:now(), createdBy:userTag(), createdByUid:currentUser?.uid
   };
   state.flows.push(flow);
+  addHistory('flow_created', `Fluxo criado: "${name}"`, flow.id);
   closeModal('modal-new-flow');
-  renderFlowsList();
-  loadFlow(flow.id);
-  updateHeaderStats();
+  renderFlowsList(); loadFlow(flow.id); updateHeaderStats();
   toast('Fluxo criado!');
 }
+
 function renderFlowsList() {
   const el = document.getElementById('flows-list');
   if (!state.flows.length) { el.innerHTML='<div class="empty-state"><div class="empty-icon">🗂</div><div>Crie seu primeiro fluxo</div></div>'; return; }
   el.innerHTML = state.flows.map(f => {
-    const bugs = state.bugs.filter(b => b.flowId===f.id).length;
+    const bugs = state.bugs.filter(b=>b.flowId===f.id).length;
     const done = (f.steps||[]).filter(s=>s.status==='ok').length;
-    const active = state.activeFlow===f.id ? 'active':'';
-    return `<div class="flow-item ${active}" onclick="loadFlow('${f.id}')">
+    return `<div class="flow-item ${state.activeFlow===f.id?'active':''}" onclick="loadFlow('${f.id}')">
       <div class="flow-name">${f.name}</div>
       <div class="flow-meta">
         <span>${(f.steps||[]).length} passos</span>
-        ${bugs ? `<span class="badge badge-bug">${bugs} bug${bugs>1?'s':''}</span>`:''}
-        ${done ? `<span class="badge badge-ok">${done} ok</span>`:''}
+        ${bugs?`<span class="badge badge-bug">${bugs} bug${bugs>1?'s':''}</span>`:''}
+        ${done?`<span class="badge badge-ok">${done} ok</span>`:''}
       </div>
+      <div style="font-size:.65rem;font-family:'JetBrains Mono';color:var(--muted);margin-top:3px;">por ${f.createdBy} · ${f.createdAt}</div>
     </div>`;
   }).join('');
 }
@@ -548,66 +524,86 @@ function loadFlow(id) {
   const flow = state.flows.find(f=>f.id===id);
   renderFlowsList();
   if (!flow) return;
-  const mc = document.getElementById('main-content');
-  mc.innerHTML = `
+  document.getElementById('main-content').innerHTML = `
     <div class="section-title">🧪 ${flow.name}</div>
-    <div class="section-sub">${flow.modules.join(' → ')} · Criado em ${flow.createdAt}</div>
-    ${flow.desc ? `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:20px;font-size:.85rem;color:var(--muted);line-height:1.6;">${flow.desc}</div>`:''}
+    <div class="section-sub">${flow.modules.join(' → ')||'—'} · ${flow.createdAt}</div>
+    <div class="audit-tag"><div class="dot"></div> Criado por <b style="color:var(--accent4);margin:0 3px;">${flow.createdBy}</b> em ${flow.createdAt}</div>
+    ${flow.desc?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:18px;font-size:.83rem;color:var(--muted);line-height:1.6;">${flow.desc}</div>`:''}
     <div class="steps-area" id="steps-area"></div>
     <button class="add-step-btn" onclick="addStep('${id}')">+ Adicionar Passo de Teste</button>
   `;
-  renderSteps(id);
-  renderBugsList();
+  renderSteps(id); renderBugsList(); renderHistory(id);
 }
 
-// ---- STEPS ----
+// ══ STEPS ══
 function addStep(flowId) {
   const flow = state.flows.find(f=>f.id===flowId);
   if (!flow) return;
-  if (!flow.steps) flow.steps = [];
-  flow.steps.push({ id:uid(), title:'', desc:'', status:'pending', images:[] });
-  renderSteps(flowId);
-  updateHeaderStats();
+  if (!flow.steps) flow.steps=[];
+  const step = {
+    id:uid(), title:'', desc:'', status:'pending', images:[],
+    createdAt:now(), createdBy:userTag(),
+    lastEditedAt:null, lastEditedBy:null,
+    statusChangedAt:null, statusChangedBy:null
+  };
+  flow.steps.push(step);
+  addHistory('step_added', `Passo adicionado no fluxo "${flow.name}"`, flowId);
+  renderSteps(flowId); updateHeaderStats();
 }
 function removeStep(flowId, stepId) {
   const flow = state.flows.find(f=>f.id===flowId);
+  const step = flow.steps.find(s=>s.id===stepId);
+  addHistory('step_removed', `Passo removido: "${step?.title||'sem título'}"`, flowId);
   flow.steps = flow.steps.filter(s=>s.id!==stepId);
-  renderSteps(flowId);
-  updateHeaderStats();
+  renderSteps(flowId); updateHeaderStats();
 }
 function cycleStatus(flowId, stepId) {
   const flow = state.flows.find(f=>f.id===flowId);
   const step = flow.steps.find(s=>s.id===stepId);
   const cycle = ['pending','ok','bug','blocked'];
+  const prev = step.status;
   step.status = cycle[(cycle.indexOf(step.status)+1)%cycle.length];
-  renderSteps(flowId);
+  step.statusChangedAt = now(); step.statusChangedBy = userTag();
+  const statusNames = {pending:'Pendente',ok:'OK',bug:'Bug',blocked:'Bloqueado'};
+  addHistory('status_changed', `Status do passo "${step.title||'sem título'}": ${statusNames[prev]} → ${statusNames[step.status]}`, flowId);
+  renderSteps(flowId); updateHeaderStats();
 }
 function updateStepField(flowId, stepId, field, val) {
   const flow = state.flows.find(f=>f.id===flowId);
   const step = flow.steps.find(s=>s.id===stepId);
   step[field] = val;
+  step.lastEditedAt = now(); step.lastEditedBy = userTag();
+  if (field==='title'||field==='desc') {
+    addHistory('step_edited', `Passo editado: "${step.title||'sem título'}"`, flowId);
+  }
+  updateHeaderStats();
 }
 
-const statusLabel = { pending:'⏳ Pendente', ok:'✅ OK', bug:'🐛 Bug', blocked:'⛔ Bloqueado' };
-const statusClass = { pending:'status-pending', ok:'status-ok', bug:'status-bug', blocked:'status-blocked' };
+const statusLabel = {pending:'⏳ Pendente',ok:'✅ OK',bug:'🐛 Bug',blocked:'⛔ Bloqueado'};
+const statusClass = {pending:'status-pending',ok:'status-ok',bug:'status-bug',blocked:'status-blocked'};
 
 function renderSteps(flowId) {
   const flow = state.flows.find(f=>f.id===flowId);
   const area = document.getElementById('steps-area');
   if (!area) return;
-  if (!flow.steps||!flow.steps.length) { area.innerHTML='<div style="color:var(--muted);font-size:.85rem;padding:8px 0;">Nenhum passo adicionado ainda.</div>'; return; }
+  if (!flow.steps||!flow.steps.length) { area.innerHTML='<div style="color:var(--muted);font-size:.83rem;padding:6px 0;">Nenhum passo adicionado ainda.</div>'; return; }
   area.innerHTML = flow.steps.map((s,i) => `
     <div class="step-card" id="sc-${s.id}">
       <div class="step-header">
         <div class="step-num">${String(i+1).padStart(2,'0')}</div>
         <input class="step-title-input" placeholder="Descreva a ação do passo..."
-          value="${s.title}" onchange="updateStepField('${flowId}','${s.id}','title',this.value)">
+          value="${s.title.replace(/"/g,'&quot;')}" onchange="updateStepField('${flowId}','${s.id}','title',this.value)">
         <button class="step-status-btn ${statusClass[s.status]}" onclick="cycleStatus('${flowId}','${s.id}')">${statusLabel[s.status]}</button>
         <button class="remove-step" onclick="removeStep('${flowId}','${s.id}')" title="Remover">✕</button>
       </div>
       <div class="step-body">
-        <textarea class="step-desc" placeholder="Detalhes do passo, dados utilizados, resultado observado..."
+        <textarea class="step-desc" placeholder="Detalhes, dados utilizados, resultado observado..."
           onchange="updateStepField('${flowId}','${s.id}','desc',this.value)">${s.desc}</textarea>
+        <div class="step-audit">
+          <div class="step-audit-item">👤 Criado por <b>${s.createdBy}</b> · ${s.createdAt}</div>
+          ${s.lastEditedBy?`<div class="step-audit-item">✏️ Editado por <b>${s.lastEditedBy}</b> · ${s.lastEditedAt}</div>`:''}
+          ${s.statusChangedBy?`<div class="step-audit-item">🔄 Status por <b>${s.statusChangedBy}</b> · ${s.statusChangedAt}</div>`:''}
+        </div>
         <div class="screenshot-zone" onclick="document.getElementById('img-${s.id}').click()">
           <input type="file" id="img-${s.id}" accept="image/*" multiple onchange="addImages('${flowId}','${s.id}',this)">
           📷 Clique para anexar print / evidência
@@ -620,8 +616,7 @@ function renderSteps(flowId) {
             </div>`).join('')}
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function addImages(flowId, stepId, input) {
@@ -630,132 +625,146 @@ function addImages(flowId, stepId, input) {
   if (!step.images) step.images=[];
   Array.from(input.files).forEach(file => {
     const r = new FileReader();
-    r.onload = e => { step.images.push(e.target.result); renderSteps(flowId); };
+    r.onload = e => { step.images.push(e.target.result); renderSteps(flowId); updateHeaderStats(); };
     r.readAsDataURL(file);
   });
 }
 function removeImg(flowId, stepId, idx) {
   const flow = state.flows.find(f=>f.id===flowId);
-  const step = flow.steps.find(s=>s.id===stepId);
-  step.images.splice(idx,1);
-  renderSteps(flowId);
+  flow.steps.find(s=>s.id===stepId).images.splice(idx,1);
+  renderSteps(flowId); updateHeaderStats();
 }
-function viewImg(src) {
-  document.getElementById('modal-img-src').src = src;
-  document.getElementById('modal-img').classList.add('open');
-}
+function viewImg(src) { document.getElementById('modal-img-src').src=src; document.getElementById('modal-img').classList.add('open'); }
 
-// ---- BUGS ----
+// ══ BUGS ══
 function saveBug() {
   const title = document.getElementById('bug-title').value.trim();
   if (!title) { toast('Informe o título do bug'); return; }
   const bug = {
-    id: uid(),
-    flowId: state.activeFlow,
-    title,
+    id:uid(), flowId:state.activeFlow, title,
     module: document.getElementById('bug-module').value,
     severity: document.getElementById('bug-severity').value,
     expected: document.getElementById('bug-expected').value,
     actual: document.getElementById('bug-actual').value,
     steps: document.getElementById('bug-steps').value,
-    createdAt: new Date().toLocaleDateString('pt-BR')
+    createdAt:now(), createdBy:userTag(), createdByUid:currentUser?.uid
   };
   state.bugs.push(bug);
-  ['bug-title','bug-expected','bug-actual','bug-steps'].forEach(id => document.getElementById(id).value='');
-  document.getElementById('bug-module').value='';
-  document.getElementById('bug-severity').value='medium';
-  renderBugsList();
-  updateHeaderStats();
-  toast('Bug registrado!');
+  addHistory('bug_created', `Bug registrado: "${title}" [${bug.severity}]`, state.activeFlow);
+  ['bug-title','bug-expected','bug-actual','bug-steps'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('bug-module').value=''; document.getElementById('bug-severity').value='medium';
+  renderBugsList(); updateHeaderStats(); toast('Bug registrado!');
 }
 
-const sevIcon = { critical:'🔴', high:'🟠', medium:'🟡', low:'🔵' };
-const sevClass = { critical:'sev-critical', high:'sev-high', medium:'sev-medium', low:'sev-low' };
+const sevIcon = {critical:'🔴',high:'🟠',medium:'🟡',low:'🔵'};
+const sevClass = {critical:'sev-critical',high:'sev-high',medium:'sev-medium',low:'sev-low'};
 
 function renderBugsList() {
   const el = document.getElementById('bugs-list');
   const bugs = state.activeFlow ? state.bugs.filter(b=>b.flowId===state.activeFlow) : state.bugs;
-  if (!bugs.length) { el.innerHTML='<div style="color:var(--muted);font-size:.82rem;text-align:center;padding:20px;">Nenhum bug registrado neste fluxo</div>'; return; }
+  if (!bugs.length) { el.innerHTML='<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:16px;">Nenhum bug neste fluxo</div>'; return; }
   el.innerHTML = bugs.map(b=>`
     <div class="bug-card">
       <div class="bug-card-header">
         <div class="bug-title">${b.title}</div>
         <div class="severity-dot ${sevClass[b.severity]}"></div>
       </div>
-      <div class="bug-meta">${sevIcon[b.severity]} ${b.severity} ${b.module?'· '+b.module:''} · ${b.createdAt}</div>
+      <div class="bug-meta">${sevIcon[b.severity]} ${b.severity}${b.module?' · '+b.module:''}</div>
       ${b.actual?`<div class="bug-desc">Atual: ${b.actual.substring(0,80)}${b.actual.length>80?'...':''}</div>`:''}
-    </div>
-  `).join('');
+      <div class="bug-audit">👤 por ${b.createdBy} · ${b.createdAt}</div>
+    </div>`).join('');
 }
 window.renderBugsList = renderBugsList;
 
-// ---- EXPORT ----
+// ══ HISTORY ══
+function addHistory(type, description, flowId) {
+  state.history.unshift({
+    id:uid(), type, description, flowId,
+    user:userTag(), userId:currentUser?.uid, at:now()
+  });
+  if (state.history.length > 200) state.history = state.history.slice(0,200);
+  renderHistory(flowId);
+}
+
+const historyIcon = {
+  flow_created:'🗂', step_added:'➕', step_removed:'🗑', step_edited:'✏️',
+  status_changed:'🔄', bug_created:'🐛'
+};
+
+function renderHistory(flowId) {
+  const el = document.getElementById('history-list');
+  if (!el) return;
+  const items = flowId ? state.history.filter(h=>h.flowId===flowId) : state.history;
+  if (!items.length) { el.innerHTML='<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:16px;">Nenhuma alteração registrada</div>'; return; }
+  el.innerHTML = items.map(h=>`
+    <div class="history-item">
+      <div class="history-action"><span class="history-icon">${historyIcon[h.type]||'•'}</span>${h.description}</div>
+      <div class="history-meta">por <span class="history-user">${h.user}</span> · ${h.at}</div>
+    </div>`).join('');
+}
+
+// ══ EXPORT ══
 function openExport() {
   const lines = [];
-  lines.push('═══════════════════════════════════════════');
-  lines.push('         RELATÓRIO DE TESTES MANUAIS       ');
-  lines.push(`         Gerado em: ${new Date().toLocaleString('pt-BR')}`);
-  lines.push('═══════════════════════════════════════════\n');
+  lines.push('═══════════════════════════════════════════════');
+  lines.push('         RELATÓRIO DE TESTES MANUAIS — QA FLOW ');
+  lines.push(`         Gerado em: ${now()} por ${userTag()}`);
+  lines.push('═══════════════════════════════════════════════\n');
   state.flows.forEach((flow,fi) => {
     lines.push(`FLUXO ${fi+1}: ${flow.name}`);
+    lines.push(`Criado por: ${flow.createdBy} em ${flow.createdAt}`);
     lines.push(`Módulos: ${flow.modules.join(', ')||'—'}`);
     if (flow.desc) lines.push(`Contexto: ${flow.desc}`);
-    lines.push('─────────────────────────────────────────');
+    lines.push('───────────────────────────────────────────────');
     (flow.steps||[]).forEach((s,si) => {
       const icon = {pending:'⏳',ok:'✅',bug:'🐛',blocked:'⛔'}[s.status]||'⏳';
       lines.push(`  Passo ${si+1}: ${icon} ${s.title||'(sem título)'}`);
       if (s.desc) lines.push(`    Detalhe: ${s.desc}`);
-      if (s.images&&s.images.length) lines.push(`    Evidências: ${s.images.length} imagem(ns) anexada(s)`);
+      lines.push(`    Criado por: ${s.createdBy} · ${s.createdAt}`);
+      if (s.lastEditedBy) lines.push(`    Editado por: ${s.lastEditedBy} · ${s.lastEditedAt}`);
+      if (s.statusChangedBy) lines.push(`    Status alterado por: ${s.statusChangedBy} · ${s.statusChangedAt}`);
+      if (s.images?.length) lines.push(`    Evidências: ${s.images.length} imagem(ns)`);
     });
     const flowBugs = state.bugs.filter(b=>b.flowId===flow.id);
     if (flowBugs.length) {
       lines.push('\n  BUGS DESTE FLUXO:');
       flowBugs.forEach((b,bi) => {
         lines.push(`  Bug ${bi+1}: [${b.severity.toUpperCase()}] ${b.title}`);
+        lines.push(`    Registrado por: ${b.createdBy} · ${b.createdAt}`);
         if (b.module) lines.push(`    Módulo: ${b.module}`);
         if (b.expected) lines.push(`    Esperado: ${b.expected}`);
         if (b.actual) lines.push(`    Atual: ${b.actual}`);
         if (b.steps) lines.push(`    Reprodução:\n      ${b.steps.split('\n').join('\n      ')}`);
       });
     }
-    lines.push('\n');
+    lines.push('');
   });
-  if (state.bugs.length) {
-    lines.push('═══════════════════════════════════════════');
-    lines.push('RESUMO GERAL DE BUGS');
-    lines.push(`Total: ${state.bugs.length} bug(s) registrado(s)`);
-    const bySev = {};
-    state.bugs.forEach(b => { bySev[b.severity]=(bySev[b.severity]||0)+1; });
-    Object.entries(bySev).forEach(([k,v]) => lines.push(`  ${sevIcon[k]} ${k}: ${v}`));
-  }
   const text = lines.join('\n');
   document.getElementById('export-content').style.whiteSpace='pre-wrap';
   document.getElementById('export-content').textContent = text;
   document.getElementById('modal-export').classList.add('open');
 }
-function copyReport() {
-  navigator.clipboard.writeText(document.getElementById('export-content').textContent);
-  toast('Relatório copiado!');
-}
+function copyReport() { navigator.clipboard.writeText(document.getElementById('export-content').textContent); toast('Copiado!'); }
 function downloadReport() {
   const text = document.getElementById('export-content').textContent;
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text],{type:'text/plain'}));
-  a.download = `relatorio-testes-${new Date().toISOString().split('T')[0]}.txt`;
-  a.click(); toast('Baixando...');
+  const a = document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));
+  a.download=`relatorio-qa-${new Date().toISOString().split('T')[0]}.txt`; a.click(); toast('Baixando...');
 }
 
-// ---- MODAL ----
+// ══ MODAL ══
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); }));
 </script>
 
-<!-- Firebase SDK — CORRETO -->
+<!-- ══ FIREBASE ══ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc }
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+           signOut, onAuthStateChanged, updateProfile }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, setDoc, getDoc }
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // ✅ Suas credenciais do Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDhNyWlnP8It-A36qCts2lfsWYsQae2FMw",
     authDomain: "qa-flow-meus-testes.firebaseapp.com",
@@ -765,47 +774,109 @@ document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('cli
     appId: "1:527010524546:web:0e4135e8f9db3a9238b39b"
   };
 
-  // ✅ Inicializa o Firebase e o Firestore corretamente
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // ✅ Carrega dados salvos ao abrir o app
-  window.addEventListener('load', async () => {
+  // ── Salvar na nuvem ──
+  window.saveToCloud = async function() {
+    if (!window.currentUser) return;
+    window.showSaving && window.showSaving(true);
     try {
-      const snap = await getDocs(collection(db, 'qa_state'));
-      if (!snap.empty) {
-        const saved = snap.docs[0].data();
-        if (saved.flows) window.state.flows = JSON.parse(saved.flows);
-        if (saved.bugs)  window.state.bugs  = JSON.parse(saved.bugs);
-        window._stateDocId = snap.docs[0].id;
+      await setDoc(doc(db, 'qa_state', 'main'), {
+        flows:   JSON.stringify(window.state.flows),
+        bugs:    JSON.stringify(window.state.bugs),
+        history: JSON.stringify(window.state.history),
+        updated: new Date().toISOString(),
+        updatedBy: window.currentUser.displayName || window.currentUser.email
+      });
+    } catch(e) { console.error('Erro ao salvar:', e); }
+    finally { setTimeout(()=> window.showSaving && window.showSaving(false), 800); }
+  };
+
+  // ── Carregar da nuvem ──
+  async function loadFromCloud() {
+    try {
+      const snap = await getDoc(doc(db, 'qa_state', 'main'));
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.flows)   window.state.flows   = JSON.parse(d.flows);
+        if (d.bugs)    window.state.bugs    = JSON.parse(d.bugs);
+        if (d.history) window.state.history = JSON.parse(d.history);
         window.renderFlowsList();
         window.renderBugsList();
         window.updateHeaderStats();
-        window.toast('✅ Dados carregados da nuvem!');
+        window.toast('✅ Dados carregados!');
       }
-    } catch(e) {
-      console.log('Sem dados salvos ainda ou erro ao carregar:', e);
+    } catch(e) { console.log('Sem dados ou erro:', e); }
+  }
+
+  // ── Auth state ──
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      window.currentUser = { uid:user.uid, email:user.email, displayName:user.displayName||user.email.split('@')[0] };
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      document.getElementById('user-name-display').textContent = window.currentUser.displayName;
+      document.getElementById('user-avatar').textContent = window.initials ? window.initials(window.currentUser.displayName) : window.currentUser.displayName[0].toUpperCase();
+      loadFromCloud();
+    } else {
+      window.currentUser = null;
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('app-screen').style.display = 'none';
     }
   });
 
-  // ✅ Função global de salvamento no Firebase
-  window.saveToCloud = async function() {
+  // ── Login ──
+  window.doLogin = async function() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = '';
+    if (!email||!pass) { errEl.textContent='Preencha e-mail e senha.'; return; }
     try {
-      const payload = {
-        flows: JSON.stringify(window.state.flows),
-        bugs:  JSON.stringify(window.state.bugs),
-        updated: new Date().toISOString()
-      };
-      if (window._stateDocId) {
-        await updateDoc(doc(db, 'qa_state', window._stateDocId), payload);
-      } else {
-        const ref = await addDoc(collection(db, 'qa_state'), payload);
-        window._stateDocId = ref.id;
-      }
+      await signInWithEmailAndPassword(auth, email, pass);
     } catch(e) {
-      console.error('Erro ao salvar na nuvem:', e);
+      const msgs = { 'auth/user-not-found':'Usuário não encontrado.', 'auth/wrong-password':'Senha incorreta.', 'auth/invalid-credential':'E-mail ou senha incorretos.', 'auth/too-many-requests':'Muitas tentativas. Tente mais tarde.' };
+      errEl.textContent = msgs[e.code] || 'Erro ao entrar. Tente novamente.';
     }
   };
+
+  // ── Registro ──
+  window.doRegister = async function() {
+    const name  = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pass  = document.getElementById('reg-password').value;
+    const errEl = document.getElementById('register-error');
+    errEl.textContent = '';
+    if (!name||!email||!pass) { errEl.textContent='Preencha todos os campos.'; return; }
+    if (pass.length<6) { errEl.textContent='Senha deve ter ao menos 6 caracteres.'; return; }
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+      window.toast('Conta criada com sucesso!');
+    } catch(e) {
+      const msgs = { 'auth/email-already-in-use':'Este e-mail já está em uso.', 'auth/invalid-email':'E-mail inválido.', 'auth/weak-password':'Senha muito fraca.' };
+      errEl.textContent = msgs[e.code] || 'Erro ao criar conta.';
+    }
+  };
+
+  // ── Logout ──
+  window.doLogout = async function() {
+    await signOut(auth);
+    window.state.flows=[]; window.state.bugs=[]; window.state.history=[]; window.state.activeFlow=null;
+    window.toast('Até logo!');
+  };
+
+  // ── Enter nos campos de login ──
+  document.addEventListener('keydown', e => {
+    if (e.key==='Enter') {
+      const lf = document.getElementById('login-form');
+      const rf = document.getElementById('register-form');
+      if (lf.style.display!=='none') window.doLogin();
+      else if (rf.style.display!=='none') window.doRegister();
+    }
+  });
 </script>
 </body>
 </html>
